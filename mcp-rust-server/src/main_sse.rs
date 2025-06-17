@@ -13,6 +13,7 @@ use rust_mcp_sdk::{
         LATEST_PROTOCOL_VERSION,
     },
 };
+use tools::ServerTools;
 // Import the necessary components for tracing
 use tracing_subscriber::{prelude::*, EnvFilter, fmt};
 
@@ -30,7 +31,7 @@ async fn main() -> SdkResult<()> {
     // Define server details for the SSE server
     let server_details = InitializeResult {
         server_info: Implementation {
-            name: "Rust Map Server (SSE)".to_string(),
+            name: "Rust mcp Server (SSE)".to_string(),
             version: "0.1.0".to_string(),
         },
         capabilities: ServerCapabilities {
@@ -41,6 +42,17 @@ async fn main() -> SdkResult<()> {
         instructions: Some("Welcome to the Rust Map Server (SSE). Connect via a web client.".into()),
         meta: None,
     };
+
+    // Log available tools on startup
+    let available_tools = ServerTools::tools();
+    tracing::info!("🚀 Starting Rust Map Server (SSE)...");
+    tracing::info!("📋 Available tools ({}):", available_tools.len());
+    for (i, tool) in available_tools.iter().enumerate() {
+        tracing::info!("   {}. {} - {}", 
+                      i + 1, 
+                      tool.name, 
+                      tool.description.as_deref().unwrap_or("No description"));
+    }
 
     tracing::info!("Instantiating custom server handler...");
     let handler = MyServerHandler {};
@@ -58,7 +70,7 @@ async fn main() -> SdkResult<()> {
     let server = hyper_server::create_server(server_details, handler, options);
 
     tracing::info!(
-        "Starting Rust Map Server (SSE) on http://0.0.0.0:8000"
+        "✅ Rust Map Server (SSE) started successfully on http://0.0.0.0:8000"
     );
 
     // Start the server and log any potential errors.

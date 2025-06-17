@@ -2572,6 +2572,7 @@ version = "0.1.0"
 dependencies = [
  "assert_cmd",
  "async-trait",
+ "env_logger",
  "predicates",
  "proptest",
  "rust-mcp-sdk",
