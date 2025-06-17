@@ -1,40 +1,39 @@
 // src/handler.rs
 
 use async_trait::async_trait;
-use rust_mcp_sdk::{
-    mcp_server::ServerHandler, // ServerHandler is in the mcp_server module
-    McpServer,                 // McpServer trait is at the crate root
-    schema::{
-        schema_utils::CallToolError, CallToolRequest, CallToolResult, ListToolsRequest,
-        ListToolsResult, RpcError,
-    },
+use rust_mcp_sdk::schema::{
+    schema_utils::CallToolError, CallToolRequest, CallToolResult, ListToolsRequest,
+    ListToolsResult, RpcError,
 };
-use crate::tools::ServerTools; // Import our generated tool enum
+use rust_mcp_sdk::{mcp_server::ServerHandler, McpServer};
 
+use crate::tools::ServerTools;
+
+// Custom Handler to handle MCP Messages
 pub struct MyServerHandler;
 
 #[async_trait]
 impl ServerHandler for MyServerHandler {
-    /// Handles the request to list all available tools.
+    // Handle ListToolsRequest, return list of available tools as ListToolsResult
     async fn handle_list_tools_request(
         &self,
         _request: ListToolsRequest,
-        _runtime: &dyn McpServer, // This now resolves correctly
-    ) -> Result<ListToolsResult, RpcError> {
+        _runtime: &dyn McpServer,
+    ) -> std::result::Result<ListToolsResult, RpcError> {
         Ok(ListToolsResult {
-            tools: ServerTools::tools(), // Use the 'tools()' method from our tool_box
+            tools: ServerTools::tools(),
             meta: None,
             next_cursor: None,
         })
     }
 
-    /// Handles a request to call a specific tool by name.
+    /// Handles incoming CallToolRequest and processes it using the appropriate tool.
     async fn handle_call_tool_request(
         &self,
         request: CallToolRequest,
-        _runtime: &dyn McpServer, // This now resolves correctly
-    ) -> Result<CallToolResult, CallToolError> {
-        // Deserialize the request parameters into our ServerTools enum
+        _runtime: &dyn McpServer,
+    ) -> std::result::Result<CallToolResult, CallToolError> {
+        // Attempt to convert request parameters into the ServerTools enum
         let tool_call: ServerTools =
             ServerTools::try_from(request.params).map_err(CallToolError::new)?;
 
