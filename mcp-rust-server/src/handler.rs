@@ -46,6 +46,7 @@ impl ServerHandler for MyServerHandler {
             ServerTools::AboutInfoTool(tool) => tool.call_tool(),
             ServerTools::GreetingTool(tool) => tool.call_tool(),
             ServerTools::SummarizeTool(tool) => tool.call_tool(),
+            ServerTools::AnalyzeProjectTool(tool) => tool.call_tool(),
         }
     }
 }
