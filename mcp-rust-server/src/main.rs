@@ -25,7 +25,7 @@ async fn main() -> SdkResult<()> {
     // Define server details and capabilities
     let server_details = InitializeResult {
         server_info: Implementation {
-            name: "Rust mcp Server".to_string(),
+            name: "Syncable-MCP-Server".to_string(),
             version: "0.1.0".to_string(),
         },
         capabilities: ServerCapabilities {
@@ -34,13 +34,13 @@ async fn main() -> SdkResult<()> {
             ..Default::default()
         },
         protocol_version: LATEST_PROTOCOL_VERSION.to_string(),
-        instructions: Some("Welcome to the Rust Map Server. Use list_tools to see available functionalities.".into()),
+        instructions: Some("Welcome to the Syncable-MCP-Server. Use list_tools to see available functionalities.".into()),
         meta: None,
     };
 
     // Log available tools on startup
     let available_tools = ServerTools::tools();
-    println!("🚀 Starting Rust Map Server...");
+    println!("🚀 Starting Syncable-MCP-Server...");
     println!("📋 Available tools ({}):", available_tools.len());
     for (i, tool) in available_tools.iter().enumerate() {
         println!("   {}. {} - {}", 

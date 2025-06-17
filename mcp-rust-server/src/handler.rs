@@ -39,12 +39,7 @@ impl ServerHandler for MyServerHandler {
 
         // Match on the specific tool variant and execute its logic
         match tool_call {
-            ServerTools::AddTool(tool) => tool.call_tool(),
-            ServerTools::MultiplyTool(tool) => tool.call_tool(),
-            ServerTools::ReverseTool(tool) => tool.call_tool(),
             ServerTools::AboutInfoTool(tool) => tool.call_tool(),
-            ServerTools::GreetingTool(tool) => tool.call_tool(),
-            ServerTools::SummarizeTool(tool) => tool.call_tool(),
             ServerTools::AnalyzeProjectTool(tool) => tool.call_tool(),
         }
     }
