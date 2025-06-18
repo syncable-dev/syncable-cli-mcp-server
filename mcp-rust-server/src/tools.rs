@@ -5,6 +5,7 @@ use rust_mcp_sdk::{
     macros::{mcp_tool, JsonSchema},
     tool_box,
 };
+use syncable_cli::cli::DisplayFormat::Matrix;
 use std::path::Path;
 use syncable_cli;
 use std::error::Error;
@@ -50,7 +51,7 @@ pub struct AnalyzeProjectTool {
 impl AnalyzeProjectTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
-        let analysis_result = syncable_cli::analyzer::analyze_project(Path::new(project_path_str));
+        let analysis_result = syncable_cli::handle_analyze(Path::new(project_path_str).to_path_buf(), false, false, Some(Matrix), None);
         match analysis_result {
             Ok(analysis) => {
                 let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
