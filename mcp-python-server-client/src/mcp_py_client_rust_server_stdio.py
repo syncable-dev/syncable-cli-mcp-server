@@ -24,7 +24,7 @@ async def main():
             reverse_result = await session.call_tool("reverse", {"text": "hello"})
             print("Reverse result:", reverse_result)
             # Call the 'code analysis' tool
-            code_analyze_result = await session.call_tool("analyzeProject", {"path": ".", "display": "detailed"})
+            code_analyze_result = await session.call_tool("analyzeProject", {"path": "../../", "display": "matrix"})
             print("Code analysis result:", code_analyze_result)
             """
             # TODO: these needs to valided with rust-mcp-server which may not be implemented yet
