@@ -5,7 +5,7 @@ use rust_mcp_sdk::{
     macros::{mcp_tool, JsonSchema},
     tool_box,
 };
-use syncable_cli::cli::DisplayFormat::Matrix;
+use syncable_cli::cli::{DisplayFormat::Matrix, DisplayFormat::Detailed, DisplayFormat::Summary};
 use std::path::Path;
 use syncable_cli;
 use std::error::Error;
@@ -46,12 +46,25 @@ impl AboutInfoTool {
 pub struct AnalyzeProjectTool {
     /// The path to the project to analyze. Defaults to the current directory.
     path: Option<String>,
+    display: Option<String>,
 }
 
 impl AnalyzeProjectTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
-        let analysis_result = syncable_cli::handle_analyze(Path::new(project_path_str).to_path_buf(), false, false, Some(Matrix), None);
+        let display = self.display.clone().unwrap_or("matrix".to_string());
+
+        let display_format = match display.as_str() {
+            "matrix" => Some(Matrix),
+            "detailed" => Some(Detailed),
+            "summary" => Some(Summary),
+            _ => None,
+        };
+
+        println!("🔍 Analyzing project: {}", project_path_str);
+        println!("🔍 Display: {}", display);
+
+        let analysis_result = syncable_cli::handle_analyze(Path::new(project_path_str).to_path_buf(), false, false, display_format, None);
         match analysis_result {
             Ok(analysis) => {
                 let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
