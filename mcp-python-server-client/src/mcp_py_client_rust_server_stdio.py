@@ -9,12 +9,12 @@ from pprint import pprint
 
 def render_utility_result(result):
     """
-    Parses and prints the formatted security scan result.
-    The result from the tool is a JSON-encoded string containing the formatted report.
-    This function decodes it and prints it to the console.
+    Parses and prints the formatted result from a tool.
+    It can handle both raw formatted strings (with ANSI codes) and
+    JSON-encoded strings containing a formatted report.
     """
     if not result or not result.content or result.isError:
-        print("Invalid or error security scan result.")
+        print("Invalid or error result.")
         pprint(result)
         return
 
@@ -22,13 +22,18 @@ def render_utility_result(result):
         # The result is a single TextContent object
         text_content = result.content[0].text
         
-        # The text is a JSON-encoded string. Loading it unescapes the content.
-        report_string = json.loads(text_content)
-        
-        # Print the human-readable report
-        print(report_string)
-    except (json.JSONDecodeError, IndexError, AttributeError) as e:
-        print(f"Error parsing security scan result: {e}")
+        try:
+            # First, try to load as JSON. This handles tool outputs that
+            # are JSON-encoded strings (e.g., a report string inside a JSON string).
+            report_string = json.loads(text_content)
+            print(report_string)
+        except json.JSONDecodeError:
+            # If JSON decoding fails, assume it's a raw, pre-formatted string
+            # (like the output from the 'about_info' tool with ANSI codes).
+            print(text_content)
+            
+    except (IndexError, AttributeError) as e:
+        print(f"Error parsing result: {e}")
         print("Printing raw result instead:")
         pprint(result)
 
@@ -45,7 +50,12 @@ async def main():
             print("Tools:")
             pprint(tools)
 
-            code_analyze_result = await session.call_tool("analyze_project", {"path": "../", "display": "detailed"})
+            # Call the 'about info' tool
+            about_info_result = await session.call_tool("about_info", {})
+            print("About info result:")
+            render_utility_result(about_info_result)
+
+            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "matrix"})
             print("Code analysis result:")
             render_utility_result(code_analyze_result)
 

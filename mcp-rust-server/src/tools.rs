@@ -25,31 +25,56 @@ impl Error for AnalyzeToolError {}
 // --- Tool to act as the "info" resource ---
 #[mcp_tool(
     name = "about_info",
-    description = "Provides information about this demo MCP server."
+    description = "Provides a detailed overview of this MCP server's capabilities, which include code analysis, security scanning, and dependency checking."
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
 pub struct AboutInfoTool {}
 
 impl AboutInfoTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
-        let info = "This is a demo MCP server with tools and resources.".to_string();
+        const BOLD: &str = "\x1B[1m";
+        const YELLOW: &str = "\x1B[33m";
+        const MAGENTA: &str = "\x1B[35m";
+        const CYAN: &str = "\x1B[36m";
+        const GREEN: &str = "\x1B[32m";
+        const RESET: &str = "\x1B[0m";
+
+        let info = format!(
+            "\n{BOLD}{MAGENTA}Welcome to the Syncable CLI MCP Server!{RESET}\n\n\
+            This server provides a powerful suite of tools to analyze your codebase directly from your AI assistant. \
+            You can perform comprehensive scans for code structure, security vulnerabilities, and dependency issues.\n\n\
+            {BOLD}{YELLOW}Here are the primary tools available:{RESET}\n\n\
+            {BOLD}1. Analysis Scan (analysis_scan):{RESET}\n\
+            \t{BOLD}What it does{RESET}: Performs a deep analysis of your project to identify languages, frameworks, architecture patterns, and more.\n\
+            \t{BOLD}How to use{RESET}: Call the tool with a {CYAN}path{RESET} to your project.\n\
+            \t{BOLD}Customization{RESET}: You can control the output format using the {CYAN}display{RESET} argument with options like {GREEN}\"matrix\"{RESET} (default), {GREEN}\"detailed\"{RESET}, or {GREEN}\"summary\"{RESET}.\n\n\
+            {BOLD}2. Security Scan (security_scan):{RESET}\n\
+            \t{BOLD}What it does{RESET}: Scans your codebase for security risks, including exposed secrets and common vulnerabilities.\n\
+            \t{BOLD}How to use{RESET}: Provide the {CYAN}path{RESET} to the project you want to scan.\n\
+            \t{BOLD}Customization{RESET}: Uses a balanced scan mode by default. Other modes like {GREEN}'lightning'{RESET} or {GREEN}'paranoid'{RESET} will be available.\n\n\
+            {BOLD}3. Dependency Scan (dependency_scan):{RESET}\n\
+            \t{BOLD}What it does{RESET}: Inspects your project's dependencies and checks them against known vulnerability databases.\n\
+            \t{BOLD}How to use{RESET}: Specify the project {CYAN}path{RESET} to scan for dependencies.\n\
+            \t{BOLD}Customization{RESET}: You can add arguments to check for licenses or filter vulnerabilities by severity level.\n\n\
+            This server empowers you to maintain high standards of code quality, security, and dependency management with simple, powerful commands.\n"
+        );
         Ok(CallToolResult::text_content(info, None))
     }
 }
 
 // --- Tool for analyzing a project ---
 #[mcp_tool(
-    name = "analyze_project",
+    name = "analysis_scan",
     description = "Analyzes a project at a given path and returns a JSON report. Defaults to the current directory if no path is provided."
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
-pub struct AnalyzeProjectTool {
+pub struct AnalysisScanTool {
     /// The path to the project to analyze. Defaults to the current directory.
     path: Option<String>,
     display: Option<String>,
 }
 
-impl AnalyzeProjectTool {
+impl AnalysisScanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
         let display = self.display.clone().unwrap_or("matrix".to_string());
@@ -140,7 +165,7 @@ impl  DependencyScanTool {
 // This generates an enum `ServerTools` that contains all our defined tools.
 tool_box!(ServerTools, [
     AboutInfoTool,
-    AnalyzeProjectTool,
+    AnalysisScanTool,
     SecurityScanTool,
     DependencyScanTool
 ]);
