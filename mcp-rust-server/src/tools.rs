@@ -39,7 +39,7 @@ impl AboutInfoTool {
 
 // --- Tool for analyzing a project ---
 #[mcp_tool(
-    name = "analyzeProject",
+    name = "analyze_project",
     description = "Analyzes a project at a given path and returns a JSON report. Defaults to the current directory if no path is provided."
 )]
 #[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
