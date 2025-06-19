@@ -39,10 +39,12 @@ async def main():
     ) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
+            
             # List available tools
             tools = await session.list_tools()
             print("Tools:")
             pprint(tools)
+
             code_analyze_result = await session.call_tool("analyzeProject", {"path": "../", "display": "detailed"})
             print("Code analysis result:")
             render_utility_result(code_analyze_result)
@@ -56,5 +58,6 @@ async def main():
             dependency_scan_result = await session.call_tool("dependency_scan", {"path": "../"})
             print("Dependency scan result:")
             render_utility_result(dependency_scan_result)
+
 
 asyncio.run(main())
