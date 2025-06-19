@@ -80,9 +80,39 @@ impl AnalyzeProjectTool {
     }
 }
 
+#[mcp_tool(
+    name = "security_scan",
+    description = "Scans a project for security vulnerabilities and secret leaks."
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct SecurityScanTool {
+    path: Option<String>,
+}
+
+impl SecurityScanTool {
+    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let project_path_str = self.path.as_deref().unwrap_or(".");
+        let security_results = syncable_cli::handle_security(Path::new(project_path_str).to_path_buf(), syncable_cli::cli::SecurityScanMode::Balanced, false, false, false, false, false, vec![], syncable_cli::cli::OutputFormat::Table, None, false);
+        match security_results {
+            Ok(analysis) => {
+                let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
+                    format!("{{\"error\": \"Failed to serialize analysis result: {}\"}}", e)
+                });
+                Ok(CallToolResult::text_content(json_output, None))
+            }
+            Err(e) => {
+                let error_message = format!("Failed to analyze project for security: {}", e);
+                Err(CallToolError::new(AnalyzeToolError(error_message)))
+            }
+        }
+    }
+}
+
+
 // --- Create a Tool Box ---
 // This generates an enum `ServerTools` that contains all our defined tools.
 tool_box!(ServerTools, [
     AboutInfoTool,
-    AnalyzeProjectTool
+    AnalyzeProjectTool,
+    SecurityScanTool
 ]);

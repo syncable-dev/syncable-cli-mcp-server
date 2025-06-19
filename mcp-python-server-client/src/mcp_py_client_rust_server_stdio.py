@@ -1,9 +1,37 @@
 import asyncio
+import json
 from mcp.client.session import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
+from pprint import pprint
 
 # to start the server, run:
 # from cpr-rust-server folder cargo run --release 
+
+def render_utility_result(result):
+    """
+    Parses and prints the formatted security scan result.
+    The result from the tool is a JSON-encoded string containing the formatted report.
+    This function decodes it and prints it to the console.
+    """
+    if not result or not result.content or result.isError:
+        print("Invalid or error security scan result.")
+        pprint(result)
+        return
+
+    try:
+        # The result is a single TextContent object
+        text_content = result.content[0].text
+        
+        # The text is a JSON-encoded string. Loading it unescapes the content.
+        report_string = json.loads(text_content)
+        
+        # Print the human-readable report
+        print(report_string)
+    except (json.JSONDecodeError, IndexError, AttributeError) as e:
+        print(f"Error parsing security scan result: {e}")
+        print("Printing raw result instead:")
+        pprint(result)
+
 
 async def main():
     async with stdio_client(
@@ -13,36 +41,15 @@ async def main():
             await session.initialize()
             # List available tools
             tools = await session.list_tools()
-            print("Tools:", tools)
-            # Call the 'add' tool
-            add_result = await session.call_tool("add", {"a": 2, "b": 3})
-            print("Add result:", add_result)
-            # Call the 'multiply' tool
-            multiply_result = await session.call_tool("multiply", {"a": 4, "b": 5})
-            print("Multiply result:", multiply_result)
-            # Call the 'reverse' tool
-            reverse_result = await session.call_tool("reverse", {"text": "hello"})
-            print("Reverse result:", reverse_result)
-            # Call the 'code analysis' tool
-            code_analyze_result = await session.call_tool("analyzeProject", {"path": "../../", "display": "matrix"})
-            print("Code analysis result:", code_analyze_result)
-            """
-            # TODO: these needs to valided with rust-mcp-server which may not be implemented yet
-            # List resources
-            resources = await session.list_resources()
-            print("Resources:", resources)
-            # Read a static resource
-            about = await session.read_resource("info://about")
-            print("About resource:", about)
-            # Read a dynamic resource
-            greeting = await session.read_resource("greeting://Alice")
-            print("Greeting:", greeting)
-            # List prompts
-            prompts = await session.list_prompts()
-            print("Prompts:", prompts)
-            # Call the 'summarize' prompt
-            summary = await session.get_prompt("summarize", {"text": "This is a long text that should be summarized."})
-            print("Summary:", summary)
-            """
+            print("Tools:")
+            pprint(tools)
+            code_analyze_result = await session.call_tool("analyzeProject", {"path": "../", "display": "detailed"})
+            print("Code analysis result:")
+            render_utility_result(code_analyze_result)
+
+            # Call the 'security scan' tool
+            security_scan_result = await session.call_tool("security_scan", {"path": "../"})
+            print("Security scan result:")
+            render_utility_result(security_scan_result)
 
 asyncio.run(main())
