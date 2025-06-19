@@ -108,11 +108,39 @@ impl SecurityScanTool {
     }
 }
 
+#[mcp_tool(
+    name = "dependency_scan",
+    description = "Scans a project for dependencies and their vulnerabilities. Defaults to the current directory if no path is provided."
+)]
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct DependencyScanTool {
+    path: Option<String>,
+}
+
+impl  DependencyScanTool {
+    pub async fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let project_path_str = self.path.as_deref().unwrap_or(".");
+        let dependency_results = syncable_cli::handle_dependencies(Path::new(project_path_str).to_path_buf(),false, false, false, false, syncable_cli::cli::OutputFormat::Table).await;
+        match dependency_results {
+            Ok(output) => {
+                let json_output = serde_json::to_string_pretty(&output).unwrap_or_else(|e| {
+                    format!("{{\"error\": \"Failed to serialize analysis result: {}\"}}", e)
+                });
+                Ok(CallToolResult::text_content(json_output, None))
+            }
+            Err(e) => {
+                let error_message = format!("Failed to analyze project for dependencies: {}", e);
+                Err(CallToolError::new(AnalyzeToolError(error_message)))
+            }
+        }
+    }
+}
 
 // --- Create a Tool Box ---
 // This generates an enum `ServerTools` that contains all our defined tools.
 tool_box!(ServerTools, [
     AboutInfoTool,
     AnalyzeProjectTool,
-    SecurityScanTool
+    SecurityScanTool,
+    DependencyScanTool
 ]);

@@ -42,6 +42,7 @@ impl ServerHandler for MyServerHandler {
             ServerTools::AboutInfoTool(tool) => tool.call_tool(),
             ServerTools::AnalyzeProjectTool(tool) => tool.call_tool(),
             ServerTools::SecurityScanTool(tool) => tool.call_tool(),
+            ServerTools::DependencyScanTool(tool) => tool.call_tool().await,
         }
     }
 }

@@ -52,4 +52,9 @@ async def main():
             print("Security scan result:")
             render_utility_result(security_scan_result)
 
+            # Call the 'dependency scan' tool
+            dependency_scan_result = await session.call_tool("dependency_scan", {"path": "../"})
+            print("Dependency scan result:")
+            render_utility_result(dependency_scan_result)
+
 asyncio.run(main())
