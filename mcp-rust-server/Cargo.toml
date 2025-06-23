@@ -2,6 +2,25 @@
 name = "mcp-rust-server"
 version = "0.1.0"
 edition = "2021"
+authors = ["Lishuai Jing <lishuai@syncable.dev>, Alex Holmberg<axth@syncable.dev>"]
+description = "High-performance Model Context Protocol (MCP) server for code analysis, security scanning, and project insights."
+license = "MIT"
+repository = "https://github.com/syncable-dev/syncable-cli-mcp-server"
+readme = "README.md"
+
+keywords = [
+    "mcp",
+    "mcp-server",
+    "AI-agents",
+    "cli",
+    "infrastructure",
+    "devops",
+    "security",
+    "analysis",
+    "scan",
+    "automation",
+    "rust"
+]
 
 [dependencies]
 # MCP server dependencies
@@ -25,21 +44,17 @@ path = "src/main_sse.rs"
 
 [dev-dependencies]
 assert_cmd = "2"
+assert_fs = "1"
 predicates = "3"
 tempfile = "3"
 proptest = "1"
+serde_json = "1.0"
+reqwest = { version = "0.11", features = ["blocking"] }
+http = "0.2"
 
 [profile.release]
 opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
-
-[[example]]
-name = "check_vulnerabilities"
-path = "examples/check_vulnerabilities.rs"
-
-[[example]]
-name = "security_analysis"
-path = "examples/security_analysis.rs"
 

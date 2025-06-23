@@ -7,7 +7,7 @@ use handler::MyServerHandler;
 use rust_mcp_sdk::{
     error::SdkResult,
     mcp_server::{hyper_server, HyperServerOptions},
-    McpServer,
+    //McpServer,
     schema::{
         Implementation, InitializeResult, ServerCapabilities, ServerCapabilitiesTools,
         LATEST_PROTOCOL_VERSION,
