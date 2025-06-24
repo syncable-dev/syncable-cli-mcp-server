@@ -16,8 +16,7 @@ readme = "README.md"
 # crates.io discoverability
 keywords = [
     "mcp", "mcp-server", "AI-agents", "cli",
-    "devops", "infrastructure", "security", "analysis",
-    "scan", "automation", "rust"
+    "devops"
 ]
 categories = [
     "command-line-utilities",
