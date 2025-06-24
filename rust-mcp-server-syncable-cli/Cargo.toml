@@ -22,8 +22,7 @@ categories = [
     "command-line-utilities",
     "network-programming",
     "security",
-    "web-programming",
-    "infrastructure"
+    "web-programming"
 ]
 
 [dependencies]
