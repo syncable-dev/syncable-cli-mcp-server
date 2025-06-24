@@ -1,7 +1,6 @@
 # mcp-rust-server
 
-[![Crates.io](https://img.shields.io/crates/v/mcp-rust-server.svg?style=for-the-badge)](https://crates.io/crates/mcp-rust-server)
-[![Docs.rs](https://img.shields.io/docsrs/mcp-rust-server?style=for-the-badge)](https://docs.rs/mcp-rust-server)
+[![Crates.io](https://img.shields.io/crates/v/mcp-rust-server.svg?style=for-the-badge)](https://crates.io/crates/rust-mcp-server-syncable-cli)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 High-performance **Model Context Protocol** (MCP) server for code analysis, security scanning, and project insights—written in Rust 🦀.
@@ -16,7 +15,6 @@ High-performance **Model Context Protocol** (MCP) server for code analysis, secu
   * [CLI Binaries](#cli-binaries)
   * [Library](#library)
 * [Usage](#usage)
-* [Examples](#examples)
 * [Documentation](#documentation)
 * [Contributing](#contributing)
 * [License](#license)
@@ -41,7 +39,7 @@ mcp-rust-server is published on [crates.io]. You need a recent Rust toolchain (1
 ### CLI Binaries
 
 ```bash
-cargo install mcp-rust-server
+cargo install rust-mcp-server-syncable-cli
 ```
 
 This installs two binaries into your Cargo `bin` directory (usually `~/.cargo/bin`):
@@ -55,7 +53,7 @@ Add to your project’s `Cargo.toml`:
 
 ```toml
 [dependencies]
-mcp-rust-server = "0.1.0"
+rust-mcp-server-syncable-cli = "0.1.0"
 ```
 
 ---
@@ -81,7 +79,7 @@ By default, both servers will:
 ### Library
 
 ```rust
-use mcp_rust_server::{start_stdio, start_sse};
+use rust_mcp_server_syncable_cli::{start_stdio, start_sse};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -100,15 +98,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ---
 
-## Examples
-
-See the \[`examples/`] directory for full end-to-end demos:
-
-* `examples/stdio_client.rs` — launch `mcp-stdio` and send sample requests
-* `examples/sse_client.html` — web page that connects to `mcp-sse` and renders events
-
----
-
 ## Documentation
 
 Full API documentation is generated on [docs.rs]:
@@ -116,9 +105,6 @@ Full API documentation is generated on [docs.rs]:
 ```bash
 cargo doc --open
 ```
-
-Or browse online:
-[https://docs.rs/mcp-rust-server](https://docs.rs/mcp-rust-server)
 
 ---
 
