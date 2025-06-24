@@ -1,0 +1,8 @@
+[workspace]
+packages = ["rust-mcp-server-syncable-cli"]
+
+[release-plz]
+manifest_path = "Cargo.toml"
+
+[changelog]
+path = "CHANGELOG.md"
