@@ -11,22 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    # Expose all three tokens to every step in this job:
+    env:
+      GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_PLZ_TOKEN:     ${{ secrets.RELEASE_PLZ_TOKEN }}
+      CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
     steps:
-      - name: Debug repository context
+      - name: Debug context & secrets
         run: |
-          echo "Repo:                     $GITHUB_REPOSITORY"
-          echo "Actor (who triggered):    $GITHUB_ACTOR"
-          echo "Repository owner:         ${{ github.repository_owner }}"
-          echo "Ref:                      $GITHUB_REF"
-          echo "Has RELEASE_PLZ_TOKEN?"; test -n "$RELEASE_PLZ_TOKEN" && echo "✔︎" || echo "✘"
-          echo "Has CARGO_REGISTRY_TOKEN?"; test -n "$CARGO_REGISTRY_TOKEN" && echo "✔︎" || echo "✘"
+          echo "Repo:                       $GITHUB_REPOSITORY"
+          echo "Actor:                      $GITHUB_ACTOR"
+          echo "Repository owner:           ${{ github.repository_owner }}"
+          echo "Ref:                        $GITHUB_REF"
+          echo "GITHUB_TOKEN length:        ${#GITHUB_TOKEN}"
+          echo "RELEASE_PLZ_TOKEN length:   ${#RELEASE_PLZ_TOKEN}"
+          echo "CARGO_REGISTRY_TOKEN length:${#CARGO_REGISTRY_TOKEN}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_PLZ_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -37,8 +43,9 @@ jobs:
         with:
           command: release --manifest-path rust-mcp-server-syncable-cli/Cargo.toml
         env:
-          GITHUB_TOKEN:       ${{ secrets.RELEASE_PLZ_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          # you can re-declare them here or just inherit the job-level ones:
+          GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
 
   release-plz-pr:
@@ -51,22 +58,27 @@ jobs:
     concurrency:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
+    env:
+      GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_PLZ_TOKEN:     ${{ secrets.RELEASE_PLZ_TOKEN }}
+      CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
     steps:
-      - name: Debug repository context
+      - name: Debug context & secrets
         run: |
-          echo "Repo:                     $GITHUB_REPOSITORY"
-          echo "Actor (who triggered):    $GITHUB_ACTOR"
-          echo "Repository owner:         ${{ github.repository_owner }}"
-          echo "Ref:                      $GITHUB_REF"
-          echo "Has RELEASE_PLZ_TOKEN?"; test -n "$RELEASE_PLZ_TOKEN" && echo "✔︎" || echo "✘"
-          echo "Has CARGO_REGISTRY_TOKEN?"; test -n "$CARGO_REGISTRY_TOKEN" && echo "✔︎" || echo "✘"
+          echo "Repo:                       $GITHUB_REPOSITORY"
+          echo "Actor:                      $GITHUB_ACTOR"
+          echo "Repository owner:           ${{ github.repository_owner }}"
+          echo "Ref:                        $GITHUB_REF"
+          echo "GITHUB_TOKEN length:        ${#GITHUB_TOKEN}"
+          echo "RELEASE_PLZ_TOKEN length:   ${#RELEASE_PLZ_TOKEN}"
+          echo "CARGO_REGISTRY_TOKEN length:${#CARGO_REGISTRY_TOKEN}"
 
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_PLZ_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -76,5 +88,5 @@ jobs:
         with:
           command: pr --manifest-path rust-mcp-server-syncable-cli/Cargo.toml
         env:
-          GITHUB_TOKEN:         ${{ secrets.RELEASE_PLZ_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
