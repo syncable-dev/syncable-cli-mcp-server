@@ -1,5 +1,5 @@
 // src/main.rs
-use mcp_rust_server::start_stdio;
+use rust_mcp_server_syncable_cli::start_stdio;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
