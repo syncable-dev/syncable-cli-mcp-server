@@ -1,9 +1,12 @@
 # mcp-rust-server
 
-[![Crates.io](https://img.shields.io/crates/v/mcp-rust-server.svg?style=for-the-badge)](https://crates.io/crates/rust-mcp-server-syncable-cli)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
-
 High-performance **Model Context Protocol** (MCP) server for code analysis, security scanning, and project insights—written in Rust 🦀.
+
+---
+
+## Related Project
+
+This MCP server exposes the capabilities of the [`syncable-cli`](https://crates.io/crates/syncable-cli) tool to AI agents. While `syncable-cli` is a standalone CLI tool for interacting with Syncable workspaces, this server acts as a bridge, allowing AI agents and other clients to access those CLI features programmatically via the Model Context Protocol (MCP). Both projects are closely related and complement each other.
 
 ---
 
@@ -34,7 +37,7 @@ High-performance **Model Context Protocol** (MCP) server for code analysis, secu
 
 ## Installation
 
-mcp-rust-server is published on [crates.io]. You need a recent Rust toolchain (1.70+ recommended).
+rust-mcp-server-syncable-cli is published on [crates.io]. You need a recent Rust toolchain (1.70+ recommended). It works as a MCP server for AI agents where you can use langgraph framework or similar to connect to this MCP server for code scanning. 
 
 ### CLI Binaries
 

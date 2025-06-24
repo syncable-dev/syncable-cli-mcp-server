@@ -13,6 +13,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Debug repository context
+        run: |
+          echo "Repo:        $GITHUB_REPOSITORY"
+          echo "Owner:       ${{ github.repository_owner }}"
+          echo "Ref:         $GITHUB_REF"
+          echo "Has Cargo token?"; test -n "$CARGO_REGISTRY_TOKEN" && echo "✔︎" || echo "✘"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -39,6 +46,13 @@ jobs:
       group: release-plz-${{ github.ref }}
       cancel-in-progress: false
     steps:
+      - name: Debug repository context
+        run: |
+          echo "Repo:        $GITHUB_REPOSITORY"
+          echo "Owner:       ${{ github.repository_owner }}"
+          echo "Ref:         $GITHUB_REF"
+          echo "Has Cargo token?"; test -n "$CARGO_REGISTRY_TOKEN" && echo "✔︎" || echo "✘"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
