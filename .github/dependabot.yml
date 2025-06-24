@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "cargo"
-    directory: "/" # Location of Cargo.toml and Cargo.lock
+    directory: "/rust-mcp-server-syncable-cli" # Location of Cargo.toml and Cargo.lock
     schedule:
       interval: "weekly"
-    target-branch: "develop"
+    target-branch: "main"
