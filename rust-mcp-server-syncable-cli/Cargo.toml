@@ -1,5 +1,5 @@
 [package]
-name = "mcp-rust-server"
+name = "rust-mcp-server-syncable-cli"
 version = "0.1.0"
 edition = "2021"
 authors = [
@@ -10,7 +10,7 @@ description = "High-performance Model Context Protocol (MCP) server for code ana
 license = "MIT"
 repository = "https://github.com/syncable-dev/syncable-cli-mcp-server"
 homepage = "https://github.com/syncable-dev/syncable-cli-mcp-server"
-documentation = "https://docs.rs/mcp-rust-server"
+documentation = "https://docs.rs/rust-mcp-server-syncable-cli"
 readme = "README.md"
 
 # crates.io discoverability
