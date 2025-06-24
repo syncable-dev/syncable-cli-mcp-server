@@ -5,11 +5,11 @@ use rust_mcp_sdk::{
     macros::{mcp_tool, JsonSchema},
     tool_box,
 };
-use syncable_cli::cli::{DisplayFormat::Matrix, DisplayFormat::Detailed, DisplayFormat::Summary};
-use std::path::Path;
-use syncable_cli;
 use std::error::Error;
 use std::fmt;
+use std::path::Path;
+use syncable_cli;
+use syncable_cli::cli::{DisplayFormat::Detailed, DisplayFormat::Matrix, DisplayFormat::Summary};
 
 #[derive(Debug)]
 struct AnalyzeToolError(String);
@@ -89,11 +89,20 @@ impl AnalysisScanTool {
         println!("🔍 Analyzing project: {}", project_path_str);
         println!("🔍 Display: {}", display);
 
-        let analysis_result = syncable_cli::handle_analyze(Path::new(project_path_str).to_path_buf(), false, false, display_format, None);
+        let analysis_result = syncable_cli::handle_analyze(
+            Path::new(project_path_str).to_path_buf(),
+            false,
+            false,
+            display_format,
+            None,
+        );
         match analysis_result {
             Ok(analysis) => {
                 let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
-                    format!("{{\"error\": \"Failed to serialize analysis result: {}\"}}", e)
+                    format!(
+                        "{{\"error\": \"Failed to serialize analysis result: {}\"}}",
+                        e
+                    )
                 });
                 Ok(CallToolResult::text_content(json_output, None))
             }
@@ -117,11 +126,26 @@ pub struct SecurityScanTool {
 impl SecurityScanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
-        let security_results = syncable_cli::handle_security(Path::new(project_path_str).to_path_buf(), syncable_cli::cli::SecurityScanMode::Balanced, false, false, false, false, false, vec![], syncable_cli::cli::OutputFormat::Table, None, false);
+        let security_results = syncable_cli::handle_security(
+            Path::new(project_path_str).to_path_buf(),
+            syncable_cli::cli::SecurityScanMode::Balanced,
+            false,
+            false,
+            false,
+            false,
+            false,
+            vec![],
+            syncable_cli::cli::OutputFormat::Table,
+            None,
+            false,
+        );
         match security_results {
             Ok(analysis) => {
                 let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
-                    format!("{{\"error\": \"Failed to serialize analysis result: {}\"}}", e)
+                    format!(
+                        "{{\"error\": \"Failed to serialize analysis result: {}\"}}",
+                        e
+                    )
                 });
                 Ok(CallToolResult::text_content(json_output, None))
             }
@@ -142,14 +166,25 @@ pub struct DependencyScanTool {
     path: Option<String>,
 }
 
-impl  DependencyScanTool {
+impl DependencyScanTool {
     pub async fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
-        let dependency_results = syncable_cli::handle_dependencies(Path::new(project_path_str).to_path_buf(),false, false, false, false, syncable_cli::cli::OutputFormat::Table).await;
+        let dependency_results = syncable_cli::handle_dependencies(
+            Path::new(project_path_str).to_path_buf(),
+            false,
+            false,
+            false,
+            false,
+            syncable_cli::cli::OutputFormat::Table,
+        )
+        .await;
         match dependency_results {
             Ok(output) => {
                 let json_output = serde_json::to_string_pretty(&output).unwrap_or_else(|e| {
-                    format!("{{\"error\": \"Failed to serialize analysis result: {}\"}}", e)
+                    format!(
+                        "{{\"error\": \"Failed to serialize analysis result: {}\"}}",
+                        e
+                    )
                 });
                 Ok(CallToolResult::text_content(json_output, None))
             }
@@ -163,9 +198,12 @@ impl  DependencyScanTool {
 
 // --- Create a Tool Box ---
 // This generates an enum `ServerTools` that contains all our defined tools.
-tool_box!(ServerTools, [
-    AboutInfoTool,
-    AnalysisScanTool,
-    SecurityScanTool,
-    DependencyScanTool
-]);
+tool_box!(
+    ServerTools,
+    [
+        AboutInfoTool,
+        AnalysisScanTool,
+        SecurityScanTool,
+        DependencyScanTool
+    ]
+);

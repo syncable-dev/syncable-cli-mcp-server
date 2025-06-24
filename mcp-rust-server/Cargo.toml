@@ -2,32 +2,36 @@
 name = "mcp-rust-server"
 version = "0.1.0"
 edition = "2021"
-authors = ["Lishuai Jing <lishuai@syncable.dev>, Alex Holmberg<axth@syncable.dev>"]
+authors = [
+    "Lishuai Jing <lishuai@syncable.dev>",
+    "Alex Holmberg <axth@syncable.dev>",
+]
 description = "High-performance Model Context Protocol (MCP) server for code analysis, security scanning, and project insights."
 license = "MIT"
 repository = "https://github.com/syncable-dev/syncable-cli-mcp-server"
+homepage = "https://github.com/syncable-dev/syncable-cli-mcp-server"
+documentation = "https://docs.rs/mcp-rust-server"
 readme = "README.md"
 
+# crates.io discoverability
 keywords = [
-    "mcp",
-    "mcp-server",
-    "AI-agents",
-    "cli",
-    "infrastructure",
-    "devops",
+    "mcp", "mcp-server", "AI-agents", "cli",
+    "devops", "infrastructure", "security", "analysis",
+    "scan", "automation", "rust"
+]
+categories = [
+    "command-line-utilities",
+    "network-programming",
     "security",
-    "analysis",
-    "scan",
-    "automation",
-    "rust"
+    "web-programming",
+    "infrastructure"
 ]
 
 [dependencies]
-# MCP server dependencies
 async-trait = "0.1.88"
 rust-mcp-sdk = "0.4.3"
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.19", features = ["fmt","env-filter"] }
+tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
@@ -57,4 +61,3 @@ opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
-
