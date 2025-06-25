@@ -45,7 +45,8 @@ jobs:
         if: ${{ github.repository_owner == 'syncable-dev' }}
         uses: release-plz/action@v0.5
         with:
-          command: release --manifest-path rust-mcp-server-syncable-cli/Cargo.toml
+          command: release 
+          manifest_path: rust-mcp-server-syncable-cli/Cargo.toml
         env:
           # you can re-declare them here or just inherit the job-level ones:
           GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
@@ -90,7 +91,8 @@ jobs:
       - name: Run release-plz PR
         uses: release-plz/action@v0.5
         with:
-          command: pr --manifest-path rust-mcp-server-syncable-cli/Cargo.toml
+          command: release-pr 
+          manifest_path: rust-mcp-server-syncable-cli/Cargo.toml
         env:
           GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
