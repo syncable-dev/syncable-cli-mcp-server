@@ -262,6 +262,116 @@ We are planning to add **first-class support for the [LangGraph](https://github.
 
 ---
 
+## Python LangGraph Agent Integration
+
+You can use the [LangGraph](https://github.com/langchain-ai/langgraph) framework to connect to this MCP server in both stdio and SSE modes. Below are example Python scripts for each mode.
+
+### Using Stdio Mode
+
+This example launches the `mcp-stdio` binary and connects via stdio:
+
+```python
+import asyncio
+import os
+from dotenv import load_dotenv
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+import openai
+
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+async def main():
+    client = MultiServerMCPClient({
+        "syncable_cli": {
+            "command": "mcp-stdio",  # Ensure mcp-stdio is in your PATH
+            "args": [],
+            "transport": "stdio",
+        }
+    })
+
+    tools = await client.get_tools()
+    print(f"Fetched {len(tools)} tools:")
+    for t in tools:
+        print(f" • {t.name}")
+
+    agent = create_react_agent("openai:gpt-4o", tools)
+
+    tests = [
+        ("about_info",    "Call the 'about_info' tool."),
+        ("analysis_scan", "Call 'analysis_scan' on path '../' with display 'matrix'."),
+        ("security_scan", "Call 'security_scan' on path '../'."),
+        ("dependency_scan","Call 'dependency_scan' on path '../'."),
+    ]
+
+    for name, prompt in tests:
+        print(f"\n--- {name} → {prompt}")
+        resp = await agent.ainvoke({
+            "messages": [{"role": "user", "content": prompt}]
+        })
+        print(resp)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Using SSE Mode
+
+This example connects to a running `mcp-sse` server via HTTP/SSE:
+
+```python
+import asyncio
+import os
+from dotenv import load_dotenv
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+import openai
+
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+async def main():
+    client = MultiServerMCPClient({
+        "demo": {
+            "url": "http://127.0.0.1:8000/sse",
+            "transport": "sse",
+        }
+    })
+
+    tools = await client.get_tools()
+    print(f"Fetched {len(tools)} tools from MCP server:")
+    for t in tools:
+        print(f" • {t.name}")
+
+    agent = create_react_agent("openai:gpt-4o", tools)
+
+    prompts = [
+        ("about_info",     "Call the 'about_info' tool."),
+        ("analysis_scan",  "Call the 'analysis_scan' tool on path '../' with display 'matrix'."),
+        ("security_scan",  "Call the 'security_scan' tool on path '../'."),
+        ("dependency_scan","Call the 'dependency_scan' tool on path '../'."),
+    ]
+
+    for name, prompt in prompts:
+        print(f"\n--- Invoking {name} ---")
+        resp = await agent.ainvoke({
+            "messages": [{"role": "user", "content": prompt}]
+        })
+        print(resp)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+**Requirements:**
+- Install the required Python packages:
+  ```bash
+  pip install langgraph openai python-dotenv langchain_mcp_adapters
+  ```
+- For stdio mode, ensure `mcp-stdio` is in your `PATH`.
+- For SSE mode, start the server with `mcp-sse` and connect to the correct URL.
+
+---
 
 ## License
 
