@@ -35,6 +35,8 @@ serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 env_logger = "0.11"
 syncable-cli = "0.11.1"
+axum = { version = "0.8.4", features = ["json"] }
+futures = "0.3.31"
 
 [[bin]]
 name = "mcp-stdio"
@@ -43,6 +45,10 @@ path = "src/main.rs"
 [[bin]]
 name = "mcp-sse"
 path = "src/main_sse.rs"
+
+[[bin]]
+name = "mcp-rest"
+path = "src/main_rest.rs"
 
 [dev-dependencies]
 assert_cmd = "2"
