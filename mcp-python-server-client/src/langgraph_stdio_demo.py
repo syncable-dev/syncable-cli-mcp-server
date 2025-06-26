@@ -1,45 +1,47 @@
+# src/langgraph_stdio_demo.py
+
 import asyncio
 import os
 from dotenv import load_dotenv
+
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 import openai
 
-# Load .env file
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 async def main():
     client = MultiServerMCPClient({
-        "math": {
-            "command": "python",
-            "args": ["src/demo_server.py"],
-            "transport": "stdio"
+        "syncable_cli": {
+            # Adjust this path if needed—just needs to point
+            # at your compiled mcp-stdio binary.
+            "command": "../rust-mcp-server-syncable-cli/target/release/mcp-stdio",
+            "args": [],              # no extra args
+            "transport": "stdio",    # stdio transport
         }
     })
 
     tools = await client.get_tools()
-    print(f"Fetched {len(tools)} tools from MCP server.")
-    for tool in tools:
-        print(f"- {tool.name}")
+    print(f"Fetched {len(tools)} tools:")
+    for t in tools:
+        print(f" • {t.name}")
 
     agent = create_react_agent("openai:gpt-4o", tools)
 
-    prompts = [
-        ("about_info", "Call the 'about_info' tool."),
-        ("analysis_scan", "Call the 'analysis_scan' tool on path '../' with display 'matrix'."),
-        ("security_scan", "Call the 'security_scan' tool on path '../'."),
-        ("dependency_scan", "Call the 'dependency_scan' tool on path '../'.")
+    tests = [
+        ("about_info",    "Call the 'about_info' tool."),
+        ("analysis_scan", "Call 'analysis_scan' on path '../' with display 'matrix'."),
+        ("security_scan", "Call 'security_scan' on path '../'."),
+        ("dependency_scan","Call 'dependency_scan' on path '../'."),
     ]
 
-    for tool_name, prompt in prompts:
-        print(f"\nInvoking agent to call '{tool_name}'...")
-        response = await agent.ainvoke({
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
+    for name, prompt in tests:
+        print(f"\n--- {name} → {prompt}")
+        resp = await agent.ainvoke({
+            "messages": [{"role": "user", "content": prompt}]
         })
-        print(f"Result for '{tool_name}':")
-        print(response)
+        print(resp)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
