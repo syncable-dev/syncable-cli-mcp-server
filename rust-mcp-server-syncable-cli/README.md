@@ -1,4 +1,4 @@
-# mcp-rust-server
+# syncable-cli-mcp-server
 
 High-performance **Model Context Protocol** (MCP) server for code analysis, security scanning, and project insights—written in Rust 🦀.
 
@@ -17,6 +17,7 @@ This MCP server exposes the capabilities of the [`syncable-cli`](https://crates.
   * [CLI Binaries](#cli-binaries)
   * [Add to PATH](#add-to-path)
   * [Python Client Example](#python-client-example)
+  * [LangGraph Agent Integration](#langgraph-agent-integration)
   * [Library](#library)
 * [Usage](#usage)
 * [Documentation](#documentation)
@@ -50,8 +51,8 @@ cargo install rust-mcp-server-syncable-cli
 
 This installs two binaries into your Cargo `bin` directory (usually `~/.cargo/bin`):
 
-* `mcp-stdio` — stdin/stdout-based MCP server
-* `mcp-sse`   — HTTP/SSE-based MCP server
+- `mcp-stdio` — stdin/stdout-based MCP server
+- `mcp-sse`   — HTTP/SSE-based MCP server
 
 ---
 
@@ -99,24 +100,14 @@ async def main():
     ) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
-
-            # List available tools
             tools = await session.list_tools()
             print("Tools:", tools)
-
-            # Call the 'about_info' tool
             about_info_result = await session.call_tool("about_info", {})
             print("About info result:", about_info_result)
-
-            # Call the 'analysis_scan' tool
             code_analyze_result = await session.call_tool("analysis_scan", {"path": ".", "display": "matrix"})
             print("Code analysis result:", code_analyze_result)
-
-            # Call the 'security_scan' tool
             security_scan_result = await session.call_tool("security_scan", {"path": "."})
             print("Security scan result:", security_scan_result)
-
-            # Call the 'dependency_scan' tool
             dependency_scan_result = await session.call_tool("dependency_scan", {"path": "."})
             print("Dependency scan result:", dependency_scan_result)
 
@@ -138,142 +129,60 @@ If you prefer to use HTTP/SSE, start the server with:
 mcp-sse
 ```
 
-Then, in Python, you can send HTTP POST requests to `http://localhost:8000/mcp` using `requests` or `aiohttp`.
-
-Example:
 ```python
-import requests
+import asyncio
+from mcp.client.session import ClientSession
+from mcp.client.sse import sse_client
+from utils import render_utility_result  # Adjust import if needed
 
-payload = {
-    "jsonrpc": "2.0",
-    "method": "call_tool",
-    "params": {
-        "tool": "about_info",
-        "args": {}
-    },
-    "id": 1
-}
+async def main():
+    server_url = "http://127.0.0.1:8000/sse"
+    async with sse_client(server_url) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
 
-response = requests.post("http://localhost:8000/mcp", json=payload)
-print(response.json())
+            # List available tools
+            tools = await session.list_tools()
+            print("Tools:")
+            render_utility_result(tools)
+
+            # Call the 'about_info' tool
+            about_info_result = await session.call_tool("about_info", {})
+            print("About info result:")
+            render_utility_result(about_info_result)
+
+            # Call the 'analysis_scan' tool
+            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "matrix"})
+            print("Code analysis result:")
+            render_utility_result(code_analyze_result)
+
+            # Call the 'security_scan' tool
+            security_scan_result = await session.call_tool("security_scan", {"path": "../"})
+            print("Security scan result:")
+            render_utility_result(security_scan_result)
+
+            # Call the 'dependency_scan' tool
+            dependency_scan_result = await session.call_tool("dependency_scan", {"path": "../"})
+            print("Dependency scan result:")
+            render_utility_result(dependency_scan_result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ---
 
-### Library
+### LLangGraph Agent Integration
+You can use the LangGraph framework to connect to this MCP server in both stdio and SSE modes. Below are example Python scripts for each mode.
 
-Add to your project’s `Cargo.toml`:
-
-```toml
-[dependencies]
-rust-mcp-server-syncable-cli = "0.1.4"
-```
-
----
-
-## Usage
-
-### CLI Binaries
-
-```bash
-# Run the stdio-based server
-mcp-stdio
-
-# Run the SSE-based server
-mcp-sse
-```
-
-By default, both servers will:
-
-1. Read framed MCP requests (JSON-RPC) from the chosen transport
-2. Dispatch to your registered handlers
-3. Write framed MCP responses
-
----
-
-### Library
-
-```rust
-use rust_mcp_server_syncable_cli::{start_stdio, start_sse};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Run as a stdio server
-    start_stdio().await?;
-
-    // Or run as an HTTP/SSE server
-    // start_sse().await?;
-
-    Ok(())
-}
-```
-
-* `start_stdio()` initializes logging, registers tools, and listens on stdin/stdout.
-* `start_sse()` spins up an HTTP server at `http://0.0.0.0:8000/mcp` and streams MCP responses.
-
----
-
-## Documentation
-
-Full API documentation is generated on [docs.rs]:
-
-```bash
-cargo doc --open
-```
-
----
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feat/your-feature`)
-3. Commit your changes (`git commit -m "Add feature"`)
-4. Push to your fork (`git push origin feat/your-feature`)
-5. Open a pull request
-
-Run tests and lint before submitting:
-
-```bash
-cargo test
-cargo fmt -- --check
-cargo clippy -- -D warnings
-```
-
----
-
-## Roadmap & Upcoming Features
-
-### LangGraph Integration (Coming Soon 🚧)
-
-We are planning to add **first-class support for the [LangGraph](https://github.com/langchain-ai/langgraph) framework**. This will include:
-
-- **REST API Interface:**  
-  Exposing a standard RESTful API (in addition to the current MCP stdio and SSE transports), making it easy to connect LangGraph and other agent frameworks without requiring a custom Python client.
-
-- **Plug-and-Play LangGraph Support:**  
-  Example workflows and documentation for integrating this MCP server as a tool node in LangGraph pipelines.
-
-- **OpenAPI/Swagger Documentation:**  
-  To make it easy to explore and test the REST endpoints.
-
-**Stay tuned!** If you are interested in this feature or want to contribute, please open an issue or discussion on [GitHub](https://github.com/syncable-dev/syncable-cli-mcp-server).
-
----
-
-## Python LangGraph Agent Integration
-
-You can use the [LangGraph](https://github.com/langchain-ai/langgraph) framework to connect to this MCP server in both stdio and SSE modes. Below are example Python scripts for each mode.
-
-### Using Stdio Mode
-
-This example launches the `mcp-stdio` binary and connects via stdio:
+Using Stdio Mode
+This example launches the mcp-stdio binary and connects via stdio:
 
 ```python
 import asyncio
 import os
 from dotenv import load_dotenv
+
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 import openai
@@ -284,9 +193,11 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 async def main():
     client = MultiServerMCPClient({
         "syncable_cli": {
-            "command": "mcp-stdio",  # Ensure mcp-stdio is in your PATH
-            "args": [],
-            "transport": "stdio",
+            # Adjust this path if needed—just needs to point
+            # at your compiled mcp-stdio binary.
+            "command": "../rust-mcp-server-syncable-cli/target/release/mcp-stdio",
+            "args": [],              # no extra args
+            "transport": "stdio",    # stdio transport
         }
     })
 
@@ -315,14 +226,14 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### Using SSE Mode
-
-This example connects to a running `mcp-sse` server via HTTP/SSE:
+Using HTTP/SSE Mode
+This example connects to the MCP server via HTTP/SSE:
 
 ```python
 import asyncio
 import os
 from dotenv import load_dotenv
+
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 import openai
@@ -331,6 +242,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 async def main():
+    # ← Use /sse here, since `mcp-sse` prints "Server is available at .../sse"
     client = MultiServerMCPClient({
         "demo": {
             "url": "http://127.0.0.1:8000/sse",
@@ -363,31 +275,48 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-**Requirements:**
-- Install the required Python packages:
-  ```bash
-  pip install langgraph openai python-dotenv langchain_mcp_adapters
-  ```
-- For stdio mode, ensure `mcp-stdio` is in your `PATH`.
-- For SSE mode, start the server with `mcp-sse` and connect to the correct URL.
+---
+
+## 🛠️ Features
+
+- **Multi-Transport:** Connect via stdio or SSE to the Rust MCP server.
+- **Tooling:** List and invoke tools such as `about_info`, `analysis_scan`, `security_scan`, and `dependency_scan`.
+- **LangGraph Integration:** Example agents using [LangGraph](https://github.com/langchain-ai/langgraph).
+- **Extensible:** Easily add new tools or adapt to other agent frameworks.
+
+---
+
+## 🧪 Testing
+
+Run Python tests:
+
+```bash
+cargo doc --open
+```
 
 ---
 
 ## License
 
-Licensed under the [MIT License]. See \[LICENSE] for details.
+Licensed under the [MIT License](LICENSE). See [LICENSE](LICENSE) for details.
 
 ---
 
 ## Acknowledgments
 
-* Built on top of the [rust-mcp-sdk]
-* Inspired by the [Syncable CLI MCP Server]
-* Thanks to the Rust community and all contributors
+- Built on [rust-mcp-sdk](https://crates.io/crates/rust-mcp-sdk)
+- Inspired by [Syncable CLI MCP Server](https://github.com/syncable-dev/syncable-cli-mcp-server)
+- Thanks to the Rust and Python communities!
 
 [crates.io]: https://crates.io/crates/rust-mcp-server-syncable-cli
-[docs.rs]: https://docs.rs/rust-mcp-server-syncable-cli
-[examples/]: https://github.com/syncable-dev/syncable-cli-mcp-server/tree/main/examples
-[MIT License]: LICENSE
-[rust-mcp-sdk]: https://crates.io/crates/rust-mcp-sdk
-[Syncable CLI MCP Server]: https://github.com/syncable-dev/syncable-cli-mcp-server
+[docs.rs]: https://docs.rs/rust-mcp-server-
+
+
+
+
+
+
+
+
+
+
