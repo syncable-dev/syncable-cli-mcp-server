@@ -114,13 +114,6 @@ async def main():
 asyncio.run(main())
 ```
 
-**Requirements:**
-- Install the Python MCP client:  
-  ```bash
-  pip install mcp
-  ```
-- Make sure `mcp-stdio` is in your `PATH` as described above.
-
 #### Using HTTP/SSE Mode
 
 If you prefer to use HTTP/SSE, start the server with:
@@ -172,7 +165,7 @@ if __name__ == "__main__":
 
 ---
 
-### LLangGraph Agent Integration
+### LangGraph Agent Integration
 You can use the LangGraph framework to connect to this MCP server in both stdio and SSE modes. Below are example Python scripts for each mode.
 
 Using Stdio Mode
