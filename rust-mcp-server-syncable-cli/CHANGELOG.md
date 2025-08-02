@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.8...v0.1.9) - 2025-08-02
+
+### Other
+
+- Merge pull request #33 from syncable-dev/feature/langgraph-stdio-sse
+- add build and test dummy code
+
 ## [0.1.8](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.7...v0.1.8) - 2025-08-02
 
 ### Other
