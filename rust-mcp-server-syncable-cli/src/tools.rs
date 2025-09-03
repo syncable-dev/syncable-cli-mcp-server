@@ -95,6 +95,7 @@ impl AnalysisScanTool {
             false,
             display_format,
             None,
+            None,
         );
         match analysis_result {
             Ok(analysis) => {

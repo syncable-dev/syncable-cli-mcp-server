@@ -27,7 +27,7 @@ categories = [
 
 [dependencies]
 async-trait = "0.1.88"
-rust-mcp-sdk = "0.6.0"
+rust-mcp-sdk = "0.4.3"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -54,7 +54,7 @@ predicates = "3"
 tempfile = "3"
 proptest = "1"
 serde_json = "1.0"
-reqwest = { version = "0.12", features = ["blocking"] }
+reqwest = { version = "0.11", features = ["blocking"] }
 http = "0.2"
 tokio-test = "0.4.4"
 
