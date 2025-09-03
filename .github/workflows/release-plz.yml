@@ -1,0 +1,98 @@
+name: Release-plz
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-plz-release:
+    name: Release-plz release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Expose all three tokens to every step in this job:
+    env:
+      GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_PLZ_TOKEN:     ${{ secrets.RELEASE_PLZ_TOKEN }}
+      CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+    steps:
+      - name: Debug context & secrets
+        run: |
+          echo "Repo:                       $GITHUB_REPOSITORY"
+          echo "Actor:                      $GITHUB_ACTOR"
+          echo "Repository owner:           ${{ github.repository_owner }}"
+          echo "Ref:                        $GITHUB_REF"
+          echo "GITHUB_TOKEN length:        ${#GITHUB_TOKEN}"
+          echo "RELEASE_PLZ_TOKEN length:   ${#RELEASE_PLZ_TOKEN}"
+          echo "CARGO_REGISTRY_TOKEN length:${#CARGO_REGISTRY_TOKEN}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run release-plz
+        if: ${{ github.repository_owner == 'syncable-dev' }}
+        uses: release-plz/action@v0.5
+        with:
+          command: release 
+          manifest_path: rust-mcp-server-syncable-cli/Cargo.toml
+        env:
+          # you can re-declare them here or just inherit the job-level ones:
+          GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+
+  release-plz-pr:
+    name: Release-plz PR
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'syncable-dev' }}
+    permissions:
+      pull-requests: write
+      contents: write
+    concurrency:
+      group: release-plz-${{ github.ref }}
+      cancel-in-progress: false
+    env:
+      GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_PLZ_TOKEN:     ${{ secrets.RELEASE_PLZ_TOKEN }}
+      CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+    steps:
+      - name: Debug context & secrets
+        run: |
+          echo "Repo:                       $GITHUB_REPOSITORY"
+          echo "Actor:                      $GITHUB_ACTOR"
+          echo "Repository owner:           ${{ github.repository_owner }}"
+          echo "Ref:                        $GITHUB_REF"
+          echo "GITHUB_TOKEN length:        ${#GITHUB_TOKEN}"
+          echo "RELEASE_PLZ_TOKEN length:   ${#RELEASE_PLZ_TOKEN}"
+          echo "CARGO_REGISTRY_TOKEN length:${#CARGO_REGISTRY_TOKEN}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run release-plz PR
+        uses: release-plz/action@v0.5
+        with:
+          command: release-pr 
+          manifest_path: rust-mcp-server-syncable-cli/Cargo.toml
+        env:
+          GITHUB_TOKEN:          ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN:  ${{ secrets.CARGO_REGISTRY_TOKEN }}
