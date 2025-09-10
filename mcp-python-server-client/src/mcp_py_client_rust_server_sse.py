@@ -4,7 +4,7 @@ from mcp.client.session import ClientSession
 from mcp.client.sse import sse_client
 from .utils import render_utility_result
 
-# to start the server, run:
+# to start the server, run from the `rust-mcp-server-syncable-cli` directory:
 # cargo run --release --bin mcp-sse
 
 async def main():
