@@ -22,6 +22,7 @@ pub async fn start_stdio() -> SdkResult<()> {
     let server_details = InitializeResult {
         server_info: Implementation {
             name: "Syncable-MCP-Server".to_string(),
+            title: Some("Syncable MCP Server".to_string()),
             version: env!("CARGO_PKG_VERSION").to_string(),
         },
         capabilities: ServerCapabilities {
@@ -74,6 +75,7 @@ pub async fn start_sse() -> SdkResult<()> {
     let server_details = InitializeResult {
         server_info: Implementation {
             name: "Rust MCP Server (SSE)".to_string(),
+            title: Some("Rust MCP Server (SSE)".to_string()),
             version: env!("CARGO_PKG_VERSION").to_string(),
         },
         capabilities: ServerCapabilities {
