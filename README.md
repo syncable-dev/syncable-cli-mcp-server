@@ -1,137 +1,221 @@
-# 🚀 Syncable MCP Server & Python Client
+## Local Development & Testing
 
-> High-performance Model Context Protocol (MCP) server in Rust with a Python client for seamless integration and rapid prototyping.
+### Prerequisites
 
-[![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+- Rust 1.70+ (`rustup update`)
+- Python 3.8+ (for client testing)
+- [uv](https://github.com/astral-sh/uv) (`brew install uv` on macOS)
 
----
+### Building from Source
 
-## ⚡ Quick Start
-
-### 1. Build & Run the Rust MCP Server
-
+1. Clone the repository:
 ```bash
-cd mcp-rust-server
-cargo build --release
-./target/release/mcp-stdio  # or ./target/release/mcp-sse for SSE mode
+git clone https://github.com/your-org/syncable-cli-mcp-server.git
+cd syncable-cli-mcp-server
 ```
 
-### 2. Use the Python Client
+2. Build the project:
+```bash
+# Debug build
+cargo build
+
+# Release build
+cargo build --release
+```
+
+The binaries will be available in:
+- Debug: `./target/debug/mcp-stdio` and `./target/debug/mcp-sse`  
+- Release: `./target/release/mcp-stdio` and `./target/release/mcp-sse`
+
+### Testing the MCP Server
+
+1. **Test Rust Components**:
+```bash
+# Run unit tests
+cargo test
+
+# Run with logging
+RUST_LOG=debug cargo test
+```
+
+2. **Manual Testing with Python Client**:
+
+First, start the MCP server in a terminal:
+```bash
+# For stdio mode
+cargo run --bin mcp-stdio
+
+# For SSE mode (in another terminal)
+cargo run --bin mcp-sse
+```
+
+Then in another terminal, set up the Python environment:
 
 ```bash
+# Setup Python environment
 cd mcp-python-server-client
+
+# Create and activate virtual environment using uv
+uv venv
+source .venv/bin/activate
+
+# Install dependencies
+uv pip install -r requirements.txt
+# Or use sync if you have a requirements.lock
 uv sync
 
-# Example usage
+# Test stdio mode
 uv run python -m src.mcp_py_client_rust_server_stdio
+
+# Test SSE mode
+uv run python src.mcp_py_client_rust_server_sse
 ```
 
----
+3. **Verify Available Tools**:
 
-## 🎯 What This Project Does
+The server should display available tools on startup. You should see:
+- about_info
+- analysis_scan
+- security_scan
+- dependency_scan
 
-- **MCP Rust Server**: Fast, scalable server implementing the Model Context Protocol (MCP) for code analysis, LLM integration, and more.
-- **Python Client**: Easy-to-use Python interface for communicating with the Rust server via stdio or SSE.
-- **Multi-language**: Designed for integration with various tools and languages.
-
----
-
-## 📋 Key Features
-
-- 🚀 **Blazing Fast**: Rust-powered backend for maximum performance
-- 🔌 **Flexible Protocols**: Supports both stdio and SSE communication
-- 🐍 **Python Client**: Simple API for rapid prototyping and integration
-- 🛡️ **Secure**: Built with modern Rust safety guarantees
-- 🧩 **Extensible**: Easy to add new handlers and endpoints
-
----
-
-## 🛠️ Installation
-
-### Rust Server
+4. **Test Each Tool**:
 
 ```bash
-cd mcp-rust-server
-cargo build --release
+# Using stdio mode for example
+cargo run --bin mcp-stdio
 ```
-
-### Python Client
-
-```bash
-cd mcp-python-server-client
-pip install -e .  # or pip install .
-```
-
----
-
-## 📖 Usage Guide
-
-### Start the Rust Server
-
-```bash
-cd mcp-rust-server
-./target/release/mcp-stdio
-```
-
-Or for SSE mode:
-
-```bash
-./target/release/mcp-sse
-```
-
-### Use the Python Client
-
+In another terminal:
 ```python
-from mcp_py_client_rust_server_stdio import main as run_client
-run_client()
+import asyncio
+from mcp.client.session import ClientSession
+from mcp.client.stdio import StdioServerParameters, stdio_client
+
+async def test_tools():
+    async with stdio_client(
+        StdioServerParameters(command="../target/debug/mcp-stdio")
+    ) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            
+            # Test about_info
+            result = await session.call_tool("about_info", {})
+            print("About Info:", result)
+            
+            # Test analysis_scan
+            result = await session.call_tool("analysis_scan", 
+                {"path": ".", "display": "matrix"})
+            print("Analysis Scan:", result)
+            
+            # Test security_scan
+            result = await session.call_tool("security_scan", {"path": "."})
+            print("Security Scan:", result)
+            
+            # Test dependency_scan
+            result = await session.call_tool("dependency_scan", {"path": "."})
+            print("Dependency Scan:", result)
+
+asyncio.run(test_tools())
 ```
 
-Or run the provided scripts directly:
+5. **Integration Testing with LangGraph**:
 
 ```bash
-uv run python -m src.mcp_py_client_rust_server_stdio
+# Install LangGraph dependencies
+uv add langgraph openai python-dotenv langchain_mcp_adapters
+
+# Test stdio integration
+uv run python -m src.langgraph_stdio_demo
+
+# Test SSE integration
+uv run python -m src.langgraph_sse_demo
 ```
 
----
+### Common Issues & Debugging
 
-## 🧪 Development & Testing
+1. **Port Already in Use** (SSE mode):
+```bash
+lsof -i :8000  # Check if port 8000 is in use
+kill -9 <PID>  # Kill the process if needed
+```
 
-### Rust
+2. **Binary Not Found** (stdio mode):
+- Ensure the binary path in Python client matches your build location
+- Check `cargo build` succeeded
+- Verify binary permissions (`chmod +x` if needed)
+
+3. **Enable Debug Logging**:
+```bash
+# For Rust server
+RUST_LOG=debug cargo run --bin mcp-stdio
+
+# For Python client
+uv python -c "import logging; logging.basicConfig(level=logging.DEBUG)"
+```
+
+### Automated Release Process with release-plz
+
+We use [release-plz](https://github.com/MarcoIeni/release-plz) to automate versioning and publishing. The workflow is configured in `.github/workflows/release-plz.yml`.
+
+1. **Setup**:
+```bash
+# Install release-plz
+cargo install release-plz
+
+# Configure GitHub token
+export GITHUB_TOKEN=your_github_token
+export CARGO_REGISTRY_TOKEN=your_crates_io_token
+```
+
+2. **Check Release Status**:
+```bash
+# Preview what would be released
+release-plz check
+```
+
+3. **Release Process**:
+- Push your changes to the `main` branch
+- The GitHub Action will automatically:
+  - Update versions in Cargo.toml
+  - Generate changelog entries
+  - Create a release PR or publish directly
+  - Push to crates.io when ready
+
+4. **Manual Release** (if needed):
+```bash
+# Create changelog and bump version
+release-plz release
+
+# Update changelog only
+release-plz update-changelog
+```
+
+
+### Manual Pre-release Checklist
+
+Before publishing to crates.io:
+
+1. All tests pass: `cargo test`
+2. Code formatted: `cargo fmt --all -- --check`
+3. No clippy warnings: `cargo clippy -- -D warnings`
+4. Documentation up-to-date: `cargo doc --no-deps`
+5. Version bumped in:
+   - Cargo.toml
+   - CHANGELOG.md
+6. Python client examples work
+7. Both transport modes (stdio/SSE) tested
+
+### Publishing Process
+
+Only after local testing succeeds:
 
 ```bash
-cd mcp-rust-server
-cargo test
-cargo clippy
-cargo fmt
+# Login to crates.io
+cargo login
+
+# Dry run
+cargo publish --dry-run
+
+# Actual publish
+cargo publish
 ```
-
-### Python
-
-```bash
-cd mcp-python-server-client
-pytest
-```
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please open issues or pull requests. For major changes, open an issue first to discuss what you’d like to change.
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-Built with Rust 🦀 and Python 🐍, powered by the open-source community.
-
----
-
-**Need help?** Check the `docs/` folder or open an issue.

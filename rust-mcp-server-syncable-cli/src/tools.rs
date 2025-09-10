@@ -8,7 +8,7 @@ use rust_mcp_sdk::{
 use std::error::Error;
 use std::fmt;
 use std::path::Path;
-use syncable_cli;
+//use syncable_cli;
 use syncable_cli::cli::{DisplayFormat::Detailed, DisplayFormat::Matrix, DisplayFormat::Summary};
 
 #[derive(Debug)]
@@ -94,6 +94,7 @@ impl AnalysisScanTool {
             false,
             false,
             display_format,
+            None,
             None,
         );
         match analysis_result {

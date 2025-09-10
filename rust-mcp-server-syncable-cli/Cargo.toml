@@ -1,6 +1,6 @@
 [package]
 name = "rust-mcp-server-syncable-cli"
-version = "0.1.5"
+version = "0.1.10"
 edition = "2021"
 authors = [
     "Lishuai Jing <lishuai@syncable.dev>",
@@ -27,16 +27,17 @@ categories = [
 
 [dependencies]
 async-trait = "0.1.88"
-rust-mcp-sdk = "0.4.3"
+rust-mcp-sdk = "0.6.3"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 env_logger = "0.11"
-syncable-cli = "0.11.1"
+syncable-cli = "0.13.0"
 axum = { version = "0.8.4", features = ["json"] }
 futures = "0.3.31"
+bytes = "1.10.1"
 
 [[bin]]
 name = "mcp-stdio"
@@ -46,10 +47,6 @@ path = "src/main.rs"
 name = "mcp-sse"
 path = "src/main_sse.rs"
 
-[[bin]]
-name = "mcp-rest"
-path = "src/main_rest.rs"
-
 [dev-dependencies]
 assert_cmd = "2"
 assert_fs = "1"
@@ -57,8 +54,9 @@ predicates = "3"
 tempfile = "3"
 proptest = "1"
 serde_json = "1.0"
-reqwest = { version = "0.11", features = ["blocking"] }
+reqwest = { version = "0.12", features = ["blocking"] }
 http = "0.2"
+tokio-test = "0.4.4"
 
 [profile.release]
 opt-level = 3
