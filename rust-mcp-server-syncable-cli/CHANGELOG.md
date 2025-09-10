@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.9...v0.1.10) - 2025-09-08
+
+### Added
+
+- fix tools calling
+
+### Other
+
+- Merge pull request #41 from syncable-dev/dependabot/cargo/rust-mcp-server-syncable-cli/main/rust-mcp-sdk-0.6.3
+- *(deps)* update rust-mcp-sdk requirement
+- Merge pull request #37 from syncable-dev/dependabot/cargo/rust-mcp-server-syncable-cli/main/reqwest-0.12
+- *(deps)* update rust-mcp-sdk requirement
+- *(deps)* update syncable-cli requirement
+
 ## [0.1.9](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.8...v0.1.9) - 2025-08-02
 
 ### Other
