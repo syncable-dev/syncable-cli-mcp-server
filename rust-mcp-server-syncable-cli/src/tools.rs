@@ -1,6 +1,6 @@
 // src/tools.rs
 
-use rust_mcp_sdk::schema::{schema_utils::CallToolError, CallToolResult};
+use rust_mcp_sdk::schema::{schema_utils::CallToolError, CallToolResult, TextContent};
 use rust_mcp_sdk::{
     macros::{mcp_tool, JsonSchema},
     tool_box,
@@ -58,7 +58,7 @@ impl AboutInfoTool {
             \t{BOLD}Customization{RESET}: You can add arguments to check for licenses or filter vulnerabilities by severity level.\n\n\
             This server empowers you to maintain high standards of code quality, security, and dependency management with simple, powerful commands.\n"
         );
-        Ok(CallToolResult::text_content(info, None))
+        Ok(CallToolResult::text_content(vec![TextContent::new(info, None, None)]))
     }
 }
 
@@ -105,7 +105,7 @@ impl AnalysisScanTool {
                         e
                     )
                 });
-                Ok(CallToolResult::text_content(json_output, None))
+                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project: {}", e);
@@ -148,7 +148,7 @@ impl SecurityScanTool {
                         e
                     )
                 });
-                Ok(CallToolResult::text_content(json_output, None))
+                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project for security: {}", e);
@@ -187,7 +187,7 @@ impl DependencyScanTool {
                         e
                     )
                 });
-                Ok(CallToolResult::text_content(json_output, None))
+                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project for dependencies: {}", e);
