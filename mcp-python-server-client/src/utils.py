@@ -1,5 +1,10 @@
 import json
 from pprint import pprint
+from rich.console import Console
+from rich.json import JSON
+from rich.panel import Panel
+
+console = Console()
 
 def render_utility_result(result):
     """
@@ -18,12 +23,14 @@ def render_utility_result(result):
         try:
             # First, try to load as JSON. This handles tool outputs that
             # are JSON-encoded strings (e.g., a report string inside a JSON string).
-            report_string = json.loads(text_content)
-            print(report_string)
+            report_data = json.loads(text_content)
+            # Pretty print JSON with rich syntax highlighting and colors
+            json_obj = JSON(json.dumps(report_data, ensure_ascii=False))
+            console.print(Panel(json_obj, title="📋 Tool Response", border_style="blue"))
         except json.JSONDecodeError:
             # If JSON decoding fails, assume it's a raw, pre-formatted string
             # (like the output from the 'about_info' tool with ANSI codes).
-            print(text_content)
+            console.print(Panel(text_content, title="📄 Tool Response", border_style="green"))
     except (IndexError, AttributeError) as e:
         print(f"Error parsing result: {e}")
         print("Printing raw result instead:")

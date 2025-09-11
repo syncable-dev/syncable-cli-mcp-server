@@ -75,7 +75,7 @@ pub struct AnalysisScanTool {
 }
 
 impl AnalysisScanTool {
-    pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+    pub async fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
         let display = self.display.clone().unwrap_or("matrix".to_string());
 
@@ -86,29 +86,50 @@ impl AnalysisScanTool {
             _ => None,
         };
 
-        println!("🔍 Analyzing project: {}", project_path_str);
-        println!("🔍 Display: {}", display);
+        // Log to stderr so we don't interfere with MCP stdout JSON messages
+        eprintln!("🔍 Analyzing project: {}", project_path_str);
+        eprintln!("🔍 Display: {}", display);
+        eprintln!("➡️  Calling syncable_cli::handle_analyze...");
 
-        let analysis_result = syncable_cli::handle_analyze(
-            Path::new(project_path_str).to_path_buf(),
-            false,
-            false,
-            display_format,
-            None,
-            None,
-        );
+        let analysis_result = tokio::task::spawn_blocking({
+            let project_path = Path::new(project_path_str).to_path_buf();
+            move || {
+                syncable_cli::handle_analyze(
+                    project_path,
+                    true,
+                    false,
+                    display_format,
+                    None,
+                    None,
+                )
+            }
+        }).await;
+
+        let analysis_result = match analysis_result {
+            Ok(result) => result,
+            Err(e) => return Err(CallToolError::new(AnalyzeToolError(format!("Task panicked: {}", e)))),
+        };
         match analysis_result {
-            Ok(analysis) => {
-                let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
-                    format!(
-                        "{{\"error\": \"Failed to serialize analysis result: {}\"}}",
-                        e
-                    )
-                });
-                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+            Ok(analysis_json_str) => {
+                eprintln!("✅ handle_analyze returned ({} bytes)", analysis_json_str.len());
+                
+                // Validate JSON to ensure it's well-formed
+                match serde_json::from_str::<serde_json::Value>(&analysis_json_str) {
+                    Ok(_) => {
+                        eprintln!("✅ JSON validation passed");
+                        eprintln!("📤 Sending full response ({} bytes)", analysis_json_str.len());
+                        Ok(CallToolResult::text_content(vec![TextContent::new(analysis_json_str, None, None)]))
+                    }
+                    Err(e) => {
+                        eprintln!("⚠️  JSON validation failed: {}", e);
+                        eprintln!("First 500 chars: {}", &analysis_json_str[..std::cmp::min(500, analysis_json_str.len())]);
+                        return Err(CallToolError::new(AnalyzeToolError(format!("Invalid JSON response: {}", e))));
+                    }
+                }
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project: {}", e);
+                eprintln!("❌ handle_analyze error: {}", &error_message);
                 Err(CallToolError::new(AnalyzeToolError(error_message)))
             }
         }

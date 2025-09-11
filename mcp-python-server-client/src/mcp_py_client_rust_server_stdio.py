@@ -25,7 +25,7 @@ async def main():
             print("About info result:")
             render_utility_result(about_info_result)
 
-            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "matrix"})
+            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "summary"})
             print("Code analysis result:")
             render_utility_result(code_analyze_result)
 
