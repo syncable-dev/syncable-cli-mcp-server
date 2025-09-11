@@ -304,6 +304,9 @@ Licensed under the [MIT License](LICENSE). See [LICENSE](LICENSE) for details.
 [crates.io]: https://crates.io/crates/rust-mcp-server-syncable-cli
 [docs.rs]: https://docs.rs/rust-mcp-server-
 
+## Konwn Issues
+- langgraph using sse version is still under development and is not functioning well. 
+
 
 
 
