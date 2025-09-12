@@ -305,7 +305,9 @@ Licensed under the [MIT License](LICENSE). See [LICENSE](LICENSE) for details.
 [docs.rs]: https://docs.rs/rust-mcp-server-
 
 ## Konwn Issues
-- langgraph using sse version is still under development and is not functioning well. 
+- langgraph using sse version is still under development and is not functioning well. (Fixed: json output is set to be true)
+- when use json output, stdio protocal has limitations on the size of json file 8k, which causes programe to hang if the analyze scan result is too big. If this protocal is rally needed, try to disable the json output in analysis_scan
+
 
 
 
