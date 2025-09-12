@@ -47,6 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.10...v0.1.11) - 2025-09-12
+
+### Added
+
+- fixed json output print
+- update dependency
+- add limitations for langgraph sse use case
+
 ## [0.1.6](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.5...v0.1.6) - 2025-06-26
 
 ### Added
