@@ -15,7 +15,7 @@ async def main():
     # ← Use /sse here, since `mcp-sse` prints "Server is available at .../sse"
     client = MultiServerMCPClient({
         "demo": {
-            "url": "http://127.0.0.1:8000/sse",
+            "url": "http://127.0.0.1:8008/sse",
             "transport": "sse",
         }
     })

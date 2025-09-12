@@ -9,7 +9,7 @@ from .utils import render_utility_result
 
 async def main():
     # The URL where the Rust SSE server is listening.
-    server_url = "http://127.0.0.1:8000/sse"
+    server_url = "http://127.0.0.1:8008/sse"
 
     async with sse_client(server_url) as (read, write):
         async with ClientSession(read, write) as session:
