@@ -104,16 +104,20 @@ pub async fn start_sse() -> SdkResult<()> {
 
     // 4) Create handler & server options
     let handler = MyServerHandler {};
+    let port = std::env::var("MCP_PORT")
+        .ok()
+        .and_then(|s| s.parse::<u16>().ok())
+        .unwrap_or(8008);
     let options = HyperServerOptions {
         host: "0.0.0.0".to_string(),
-        port: 8000,
+        port,
         ..Default::default()
     };
 
     tracing::info!("Creating the MCP SSE server...");
     let server = hyper_server::create_server(server_details, handler, options);
 
-    tracing::info!("✅ SSE server listening on http://0.0.0.0:8000");
+    tracing::info!("✅ SSE server listening on http://0.0.0.0:{}", port);
     // 5) Run
     server.start().await?;
     Ok(())
