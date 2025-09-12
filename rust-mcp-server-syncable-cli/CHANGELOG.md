@@ -47,6 +47,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.12](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.11...v0.1.12) - 2025-09-12
+
+### Added
+
+- update port so that it doe snot conflict with fastapi port
+- upgrate MCP server and sse. limitations on stdio mode on json output is documented.
+
+### Other
+
+- Merge pull request #50 from syncable-dev/feature/langgraph-integration
+
 ## [0.1.11](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.10...v0.1.11) - 2025-09-12
 
 ### Added
