@@ -10,6 +10,7 @@ from .utils import render_utility_result
 async def main():
     async with stdio_client(
         StdioServerParameters(command="../rust-mcp-server-syncable-cli/target/release/mcp-stdio")
+        #StdioServerParameters(command="mcp-stdio")
     ) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
@@ -24,7 +25,7 @@ async def main():
             print("About info result:")
             render_utility_result(about_info_result)
 
-            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "matrix"})
+            code_analyze_result = await session.call_tool("analysis_scan", {"path": "../", "display": "summary"})
             print("Code analysis result:")
             render_utility_result(code_analyze_result)
 

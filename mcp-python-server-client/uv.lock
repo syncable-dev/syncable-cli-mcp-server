@@ -17,6 +17,7 @@ dependencies = [
     { name = "langgraph" },
     { name = "mcp", extra = ["cli"] },
     { name = "python-dotenv" },
+    { name = "rich" },
 ]
 
 [package.metadata]
@@ -27,6 +28,7 @@ requires-dist = [
     { name = "langgraph", specifier = ">=0.4.8" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.9.3" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "rich", specifier = ">=13.0.0" },
 ]
 
 [[package]]

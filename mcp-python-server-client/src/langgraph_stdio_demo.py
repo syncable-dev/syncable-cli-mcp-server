@@ -14,12 +14,14 @@ from .utils import render_utility_result
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 async def main():
     client = MultiServerMCPClient({
         "syncable_cli": {
             # Adjust this path if needed—just needs to point
             # at your compiled mcp-stdio binary.
-            "command": "../rust-mcp-server-syncable-cli/target/release/mcp-stdio",
+            #"command": "../rust-mcp-server-syncable-cli/target/release/mcp-stdio",
+            "command": "mcp-stdio",
             "args": [],              # no extra args
             "transport": "stdio",    # stdio transport
         }
