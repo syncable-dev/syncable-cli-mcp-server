@@ -30,6 +30,7 @@ async def main():
     prompts = [
         ("about_info",     "Call the 'about_info' tool."),
         ("analysis_scan",  "Call the 'analysis_scan' tool on path '../' with display 'matrix'."),
+        ("vulnerability_scan",  "Call the 'vulnerability_scan' tool on path '../'."),
         ("security_scan",  "Call the 'security_scan' tool on path '../'."),
         ("dependency_scan","Call the 'dependency_scan' tool on path '../'."),
     ]

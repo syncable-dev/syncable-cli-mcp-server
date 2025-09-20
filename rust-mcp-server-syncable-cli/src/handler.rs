@@ -43,6 +43,7 @@ impl ServerHandler for MyServerHandler {
             ServerTools::AnalysisScanTool(tool) => tool.call_tool().await,
             ServerTools::SecurityScanTool(tool) => tool.call_tool(),
             ServerTools::DependencyScanTool(tool) => tool.call_tool().await,
+            ServerTools::VulnerabilityScanTool(tool) => tool.call_tool().await,
         }
     }
 }
