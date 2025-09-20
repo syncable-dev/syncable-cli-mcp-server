@@ -27,14 +27,14 @@ categories = [
 
 [dependencies]
 async-trait = "0.1.88"
-rust-mcp-sdk = "0.6.3"
+rust-mcp-sdk = "0.7.0"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde_json = "1.0.145"
 tokio = { version = "1", features = ["full"] }
 env_logger = "0.11"
-syncable-cli = "0.18.2"
+syncable-cli = "0.18.3"
 axum = { version = "0.8.4", features = ["json"] }
 futures = "0.3.31"
 bytes = "1.10.1"
@@ -55,7 +55,7 @@ tempfile = "3"
 proptest = "1"
 serde_json = "1.0"
 reqwest = { version = "0.12", features = ["blocking"] }
-http = "0.2"
+http = "1.3.1"
 tokio-test = "0.4.4"
 
 [profile.release]
