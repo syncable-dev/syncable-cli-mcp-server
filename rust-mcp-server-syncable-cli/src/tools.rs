@@ -5,6 +5,7 @@ use rust_mcp_sdk::{
     macros::{mcp_tool, JsonSchema},
     tool_box,
 };
+use syncable_cli::cli::SeverityThreshold;
 use std::error::Error;
 use std::fmt;
 use std::path::Path;
@@ -130,6 +131,79 @@ impl AnalysisScanTool {
             Err(e) => {
                 let error_message = format!("Failed to analyze project: {}", e);
                 eprintln!("❌ handle_analyze error: {}", &error_message);
+                Err(CallToolError::new(AnalyzeToolError(error_message)))
+            }
+        }
+    }
+}
+
+#[mcp_tool(
+    name = "vulnerability_scan",
+    description = "Scans a project for known vulnerabilities."
+)]
+
+#[derive(Debug, ::serde::Deserialize, ::serde::Serialize, JsonSchema)]
+pub struct VulnerabilityScanTool {
+    path: Option<String>,
+}
+
+impl VulnerabilityScanTool {
+    pub async fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
+        let project_path_str = self.path.as_deref().unwrap_or(".");
+        
+        // Log to stderr so we don't interfere with MCP stdout JSON messages
+        eprintln!("🛡️  Scanning project for vulnerabilities: {}", project_path_str);
+        eprintln!("➡️  Calling syncable_cli::handle_vulnerabilities...");
+        
+        let vulnerability_results = tokio::task::spawn_blocking({
+            let project_path = Path::new(project_path_str).to_path_buf();
+            move || {
+                // Create a runtime for the blocking task to handle the async function
+                let rt = tokio::runtime::Runtime::new().unwrap();
+                rt.block_on(async {
+                    syncable_cli::handle_vulnerabilities(
+                        project_path,
+                        None,
+                        syncable_cli::cli::OutputFormat::Json,
+                        None,
+                    ).await
+                })
+            }
+        }).await;
+
+        let vulnerability_results = match vulnerability_results {
+            Ok(result) => result,
+            Err(e) => return Err(CallToolError::new(AnalyzeToolError(format!("Task panicked: {}", e)))),
+        };
+
+        match vulnerability_results {
+            Ok(analysis) => {
+                let json_output = serde_json::to_string_pretty(&analysis).unwrap_or_else(|e| {
+                    format!(
+                        "{{\"error\": \"Failed to serialize analysis result: {}\"}}",
+                        e
+                    )
+                });
+
+                eprintln!("✅ handle_vulnerabilities returned ({} bytes)", json_output.len());
+
+                // Validate JSON to ensure it's well-formed
+                match serde_json::from_str::<serde_json::Value>(&json_output) {
+                    Ok(_) => {
+                        eprintln!("✅ JSON validation passed");
+                        eprintln!("📤 Sending full response ({} bytes)", json_output.len());
+                        Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+                    }
+                    Err(e) => {
+                        eprintln!("⚠️  JSON validation failed: {}", e);
+                        eprintln!("First 500 chars: {}", &json_output[..std::cmp::min(500, json_output.len())]);
+                        Err(CallToolError::new(AnalyzeToolError(format!("Invalid JSON response: {}", e))))
+                    }
+                }
+            }
+            Err(e) => {
+                let error_message = format!("Failed to analyze project for vulnerabilities: {}", e);
+                eprintln!("❌ handle_vulnerabilities error: {}", &error_message);
                 Err(CallToolError::new(AnalyzeToolError(error_message)))
             }
         }
@@ -267,6 +341,7 @@ tool_box!(
     [
         AboutInfoTool,
         AnalysisScanTool,
+        VulnerabilityScanTool,
         SecurityScanTool,
         DependencyScanTool
     ]
