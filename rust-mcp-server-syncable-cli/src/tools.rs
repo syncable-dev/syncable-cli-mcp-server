@@ -148,6 +148,11 @@ pub struct SecurityScanTool {
 impl SecurityScanTool {
     pub fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
+        
+        // Log to stderr so we don't interfere with MCP stdout JSON messages
+        eprintln!("🔒 Scanning project for security: {}", project_path_str);
+        eprintln!("➡️  Calling syncable_cli::handle_security...");
+        
         let security_results = syncable_cli::handle_security(
             Path::new(project_path_str).to_path_buf(),
             syncable_cli::cli::SecurityScanMode::Balanced,
@@ -157,7 +162,7 @@ impl SecurityScanTool {
             false,
             false,
             vec![],
-            syncable_cli::cli::OutputFormat::Table,
+            syncable_cli::cli::OutputFormat::Json,
             None,
             false,
         );
@@ -169,10 +174,26 @@ impl SecurityScanTool {
                         e
                     )
                 });
-                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+                
+                eprintln!("✅ handle_security returned ({} bytes)", json_output.len());
+                
+                // Validate JSON to ensure it's well-formed
+                match serde_json::from_str::<serde_json::Value>(&json_output) {
+                    Ok(_) => {
+                        eprintln!("✅ JSON validation passed");
+                        eprintln!("📤 Sending full response ({} bytes)", json_output.len());
+                        Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+                    }
+                    Err(e) => {
+                        eprintln!("⚠️  JSON validation failed: {}", e);
+                        eprintln!("First 500 chars: {}", &json_output[..std::cmp::min(500, json_output.len())]);
+                        return Err(CallToolError::new(AnalyzeToolError(format!("Invalid JSON response: {}", e))));
+                    }
+                }
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project for security: {}", e);
+                eprintln!("❌ handle_security error: {}", &error_message);
                 Err(CallToolError::new(AnalyzeToolError(error_message)))
             }
         }
@@ -191,13 +212,18 @@ pub struct DependencyScanTool {
 impl DependencyScanTool {
     pub async fn call_tool(&self) -> Result<CallToolResult, CallToolError> {
         let project_path_str = self.path.as_deref().unwrap_or(".");
+        
+        // Log to stderr so we don't interfere with MCP stdout JSON messages
+        eprintln!("📦 Scanning project for dependencies: {}", project_path_str);
+        eprintln!("➡️  Calling syncable_cli::handle_dependencies...");
+        
         let dependency_results = syncable_cli::handle_dependencies(
             Path::new(project_path_str).to_path_buf(),
             false,
             false,
             false,
             false,
-            syncable_cli::cli::OutputFormat::Table,
+            syncable_cli::cli::OutputFormat::Json,
         )
         .await;
         match dependency_results {
@@ -208,10 +234,26 @@ impl DependencyScanTool {
                         e
                     )
                 });
-                Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+                
+                eprintln!("✅ handle_dependencies returned ({} bytes)", json_output.len());
+                
+                // Validate JSON to ensure it's well-formed
+                match serde_json::from_str::<serde_json::Value>(&json_output) {
+                    Ok(_) => {
+                        eprintln!("✅ JSON validation passed");
+                        eprintln!("📤 Sending full response ({} bytes)", json_output.len());
+                        Ok(CallToolResult::text_content(vec![TextContent::new(json_output, None, None)]))
+                    }
+                    Err(e) => {
+                        eprintln!("⚠️  JSON validation failed: {}", e);
+                        eprintln!("First 500 chars: {}", &json_output[..std::cmp::min(500, json_output.len())]);
+                        return Err(CallToolError::new(AnalyzeToolError(format!("Invalid JSON response: {}", e))));
+                    }
+                }
             }
             Err(e) => {
                 let error_message = format!("Failed to analyze project for dependencies: {}", e);
+                eprintln!("❌ handle_dependencies error: {}", &error_message);
                 Err(CallToolError::new(AnalyzeToolError(error_message)))
             }
         }
