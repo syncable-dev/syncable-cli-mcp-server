@@ -47,6 +47,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.12...v0.1.13) - 2025-09-20
+
+### Added
+
+- downgraded mcp server
+- upgrade cargo toml, and fixed json
+
+### Other
+
+- Merge pull request #52 from syncable-dev/feature/langgraph-integration
+
 ## [0.1.12](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.11...v0.1.12) - 2025-09-12
 
 ### Added
