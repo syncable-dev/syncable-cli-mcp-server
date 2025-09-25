@@ -47,6 +47,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.14](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.13...v0.1.14) - 2025-09-25
+
+### Added
+
+- added vulnerabilities scan
+
+### Other
+
+- *(deps)* update rust-mcp-sdk requirement
+- Merge pull request #54 from syncable-dev/feature/langgraph-integration
+
 ## [0.1.13](https://github.com/syncable-dev/syncable-cli-mcp-server/compare/v0.1.12...v0.1.13) - 2025-09-20
 
 ### Added
